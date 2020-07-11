@@ -9,6 +9,7 @@
 #include <taihen.h>
 #include <math.h>
 #include "log.h"
+#include "remapper.h"
 
 /*
  * Needed by newlib's libm.
@@ -334,15 +335,21 @@ static void patch_ctrl_data(const struct ds4_input_report *ds4, SceCtrlData *pad
 	if (ds4->r_trigger > DS4_TRIGGER_THRESHOLD)
 		pad_data->rt = ds4->r_trigger;
 
-	if (ds4->ps)
-		ksceCtrlSetButtonEmulation(0, 0, 0, SCE_CTRL_INTERCEPTED, 16);
-
+	if (ds4->ps) {
+		buttons |= SCE_CTRL_PSBUTTON;
+	}
+	
 	if (buttons != 0 || left_js_moved || right_js_moved ||
 	    ds4->l_trigger > DS4_TRIGGER_THRESHOLD ||
 	    ds4->r_trigger > DS4_TRIGGER_THRESHOLD)
 		ksceKernelPowerTick(0);
 
-	pad_data->buttons |= buttons;
+	// convert to mapped buttons 
+	buttons |= convert_buttons_mask(buttons);
+
+	// buttons emulated for both kernel and user apps
+	ksceCtrlSetButtonEmulation(0, 0, buttons, buttons, 16);
+	
 }
 
 static void patch_ctrl_data_all_user(const struct ds4_input_report *ds4,

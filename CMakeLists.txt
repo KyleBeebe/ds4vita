@@ -6,8 +6,9 @@ set(CMAKE_CXX_COMPILER "arm-vita-eabi-g++")
 
 project(ds4vita)
 
-set(CMAKE_C_FLAGS "-Wl,-q -Wall -O3 -std=gnu99")
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++11 -fno-rtti -fno-exceptions")
+set(MY_C_AND_CXX_FLAGS "-Wl,-q -Wall -O3")
+set(CMAKE_C_FLAGS " ${MY_C_AND_CXX_FLAGS} -std=gnu99")
+set(CMAKE_CXX_FLAGS "${MY_C_AND_CXX_FLAGS} -std=c++11 -fno-rtti -fno-exceptions")
 
 include_directories(
 )
@@ -25,6 +26,7 @@ endif(RELEASE)
 add_executable(${PROJECT_NAME}.elf
 	main.c
 	log.c
+	remapper.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}.elf
